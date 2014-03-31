@@ -1,3 +1,6 @@
+# Funktionen, um SSEA durchzuführen
+
+
 p.rand <- matrix(round(runif(2000, 0, 1), 8), ncol=20, byrow=T)
 p.obs <- matrix(round(runif(20, 0, 1), 8), ncol=20, byrow=T)
 colnames(p.rand) <- letters[1:20]
