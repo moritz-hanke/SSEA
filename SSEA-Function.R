@@ -25,7 +25,8 @@ liste.rand[[2]] <- p.rand[,colnames(p.rand) %in% set2]
 liste.rand[[3]] <- p.rand[,colnames(p.rand) %in% set3]
 names(liste.rand) <- c("set1", "set2", "set3")
 
-
+#################
+# BEISPIEL für Schachtelung von applys u.Ä.
 # für die zufälligen/permutierten Daten soll eine Sortierung für
 # jedes set/gen der variablen/snps durchgenommen werden
 b <- lapply(c(1,2,3), FUN=function(var){    # äußere lapply für Genauswahl der in der Liste
@@ -131,6 +132,8 @@ obs_k5 <- W_k_obs(liste.obs, k_first=5)
   # für alle gene aus den permutierten daten
 ### k_obs ist eine Liste mit den p-product-werten der der k-kleinsten snps 
   # für alle gene
+#################### WIRD DIESE FUNKTION EVTL NICHT MEHR GEBRAUCHT?
+#################### Wenn doch, dann nur zur Überprüfung
 p.W_k <- function(k_obs, k_per){
   lapply(c(seq_along(k_per)), 
          FUN=function(x){
@@ -157,17 +160,32 @@ lapply(c(1,2), W_k_obs, daten.obs=liste.obs)       ### Zeilen sind Gene, Spalten
 cbind(unlist(obs_k1),unlist(obs_k2),unlist(obs_k3))
 
 
-products.perm <- lapply(c(1,2), W_k_perm, daten=liste.rand)
-products.obs <- lapply(c(1,2), W_k_obs, daten.obs=liste.obs)
+products.perm <- lapply(c(1:5), W_k_perm, daten=liste.rand)
+products.obs <- lapply(c(1:5), W_k_obs, daten.obs=liste.obs)
 
 n.perm <-100
 
-lapply(c(1,2), FUN=function(ks){
-  lapply(c(1,2,3), FUN=function(gene){
-    sum(products.perm[[ks]][[gene]] <= products.obs[[ks]][[gene]])/n.perm
-  })
-})
+# Funktion um für verschiedene ks die p.Werte zu berechnen
+p.W_ks <- function(ks){
+  products.perm <- lapply(ks, W_k_perm, daten=liste.rand)
+  products.obs <- lapply(ks, W_k_obs, daten.obs=liste.obs)
+  
+  lapply(ks, FUN=function(x){
+    unlist(lapply(c(1,2,3), FUN=function(gene){
+      sum(products.perm[[x]][[gene]] <= products.obs[[x]][[gene]])/n.perm
+      }
+      )
+    )  
+  }
+  )
+}
 
+p.W_ks(1)
+
+
+
+
+str(test[[1]])
 
 
 products.perm[[2]][[3]] <= products.obs[[2]][[3]]
