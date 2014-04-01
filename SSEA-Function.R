@@ -18,7 +18,7 @@ liste.obs[[1]] <- p.obs[,colnames(p.obs) %in% set1]
 liste.obs[[2]] <- p.obs[,colnames(p.obs) %in% set2]
 liste.obs[[3]] <- p.obs[,colnames(p.obs) %in% set3]
 liste.obs[[4]] <- p.obs[,colnames(p.obs) %in% set4]
-names(liste.obs) <- c("set1", "set2", "set3")
+names(liste.obs) <- c("set1", "set2", "set3", "set4")
 
 
 liste.rand <- vector(mode="list", length=3)
@@ -26,7 +26,7 @@ liste.rand[[1]] <- p.rand[,colnames(p.rand) %in% set1]
 liste.rand[[2]] <- p.rand[,colnames(p.rand) %in% set2]
 liste.rand[[3]] <- p.rand[,colnames(p.rand) %in% set3]
 liste.rand[[4]] <- p.rand[,colnames(p.rand) %in% set4]
-names(liste.rand) <- c("set1", "set2", "set3")
+names(liste.rand) <- c("set1", "set2", "set3", "set4")
 
 #################
 # BEISPIEL für Schachtelung von applys u.Ä.
