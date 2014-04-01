@@ -148,10 +148,43 @@ p.W_k(obs_k5, per_k5)
 
 ### mittels cbind wird eine matrix erstellt, die ZEILENWEISE die GENE enthält und 
   # als SPALTEN die UNTERSCHIEDLICHEN K
+  # das hier ist zur Überprüfung, ob die Funktion funtioniert
 cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)))
 
 
 #es wird eine funktion gebraucht, die die unterschiedlichen p.W_k auf einmal erzeugt
+lapply(c(1,2), W_k_obs, daten.obs=liste.obs)       ### Zeilen sind Gene, Spalten unterschiedliche ks
+cbind(unlist(obs_k1),unlist(obs_k2),unlist(obs_k3))
+
+
+products.perm <- lapply(c(1,2), W_k_perm, daten=liste.rand)
+products.obs <- lapply(c(1,2), W_k_obs, daten.obs=liste.obs)
+
+n.perm <-100
+
+lapply(c(1,2), FUN=function(ks){
+  lapply(c(1,2,3), FUN=function(gene){
+    sum(products.perm[[ks]][[gene]] <= products.obs[[ks]][[gene]])/n.perm
+  })
+})
+
+
+
+products.perm[[2]][[3]] <= products.obs[[2]][[3]]
+
+
+products.perm[[1]] <= products.obs
+
+
+sum((lapply(c(1,2), W_k_perm, daten=liste.rand)[[2]][[3]] <= lapply(c(1,2), W_k_obs, daten.obs=liste.obs)[[2]][[3]]))/
+  nrow(liste.rand[[1]])
+
+
+
+
+
+
+
 
 
 lapply(c(seq_along(d_k1)), 
