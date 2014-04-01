@@ -1,21 +1,23 @@
 # Funktionen, um SSEA durchzuführen
 
 
-p.rand <- matrix(round(runif(2000, 0, 1), 8), ncol=20, byrow=T)
-p.obs <- matrix(round(runif(20, 0, 1), 8), ncol=20, byrow=T)
-colnames(p.rand) <- letters[1:20]
-colnames(p.obs) <- letters[1:20]
+p.rand <- matrix(round(runif(2600, 0, 1), 8), ncol=26, byrow=T)
+p.obs <- matrix(round(runif(26, 0, 1), 8), ncol=26, byrow=T)
+colnames(p.rand) <- letters[1:26]
+colnames(p.obs) <- letters[1:26]
 
 
 set1 <- letters[c(1:4, 6)]
 set2 <- letters[c(5,7:13)]
-set3 <- letters[14:20]
+set3 <- letters[14:25]
+set4 <- letters[26]
 
 
 liste.obs <- vector(mode="list", length=3)
 liste.obs[[1]] <- p.obs[,colnames(p.obs) %in% set1]
 liste.obs[[2]] <- p.obs[,colnames(p.obs) %in% set2]
 liste.obs[[3]] <- p.obs[,colnames(p.obs) %in% set3]
+liste.obs[[4]] <- p.obs[,colnames(p.obs) %in% set4]
 names(liste.obs) <- c("set1", "set2", "set3")
 
 
@@ -23,6 +25,7 @@ liste.rand <- vector(mode="list", length=3)
 liste.rand[[1]] <- p.rand[,colnames(p.rand) %in% set1]
 liste.rand[[2]] <- p.rand[,colnames(p.rand) %in% set2]
 liste.rand[[3]] <- p.rand[,colnames(p.rand) %in% set3]
+liste.rand[[4]] <- p.rand[,colnames(p.rand) %in% set4]
 names(liste.rand) <- c("set1", "set2", "set3")
 
 #################
@@ -60,23 +63,33 @@ W_k_perm <- function(perm.data, k_first){
   
   else{
     lapply(c(seq_along(perm.data)), FUN=function(var){   ### äußere lapply für Genauswahl der in der Liste
-      apply(perm.data[[var]], MARGIN=1,             ### inneres apply für zeilenweisen Zugriff auf die 
-                                                       # Datensätze/matrizen mit den Variablen
-            #~ auslagerbar
-            FUN=function(x){
-              sorted.p <- sort(x)[1:k_first]         ### Sortierung der p.-Werte und anschließend
-              sorted.p <- sorted.p[!is.na(sorted.p)]   # nur die behalten, die auch wirkluch da sind (NAs raus)
-              p.product <- prod(sorted.p)
+      
+      if(length(dim(perm.data[[var]]))>1){      ### Abfrage, ob Gen nicht nur aus einem SNP besteht; dann
+                                                  # muss apply nicht angewendet werden
+        apply(perm.data[[var]], MARGIN=1,             ### inneres apply für zeilenweisen Zugriff auf die 
+                                                        # Datensätze/matrizen mit den Variablen
               
+              FUN=function(x){
+                sorted.p <- sort(x)[1:k_first]         ### Sortierung der p.-Werte und anschließend
+                sorted.p <- sorted.p[!is.na(sorted.p)]   # nur die behalten, die auch wirkluch da sind (NAs raus)
+                p.product <- prod(sorted.p)
+              } #((())) Ende der Funktion vom inneren apply
               
-            } ### Ende der Funktion vom inneren apply
-            #~
-      ) ### Ende inneres apply
-    } ### Ende function von äußerem lapply
-    ) ### Ende äußeres lapply
-  } ### Ende von else
+        ) #((())) Ende inneres apply
+      } #((())) Ende inneres if
+      
+      else{   ### wird ausgewählt, wenn nur ein SNP in einem Gen vorliegt
+        p.product <- perm.data[[var]] ### Wenn es nur einen SNP gibt, muss nichts sortiert/multipliziert werden
+      } #((())) Ende inneres else
+      
+      
+    } #((())) Ende function von äußerem lapply
+    
+    ) #((())) Ende äußeres lapply
   
-} ## Ende der Funktion
+  } #((())) Ende von else
+  
+} #((())) Ende der Funktion
 
 d <- W_k_perm(liste.rand, 9)
 
@@ -89,11 +102,14 @@ per_k2 <- W_k_perm(liste.rand, k_first=2)
 per_k3 <- W_k_perm(liste.rand, k_first=3)
 per_k4 <- W_k_perm(liste.rand, k_first=4)
 per_k5 <- W_k_perm(liste.rand, k_first=5)
+per_k6 <- W_k_perm(liste.rand, k_first=6)
+per_k7 <- W_k_perm(liste.rand, k_first=7)
+per_k8 <- W_k_perm(liste.rand, k_first=8)
+per_k9 <- W_k_perm(liste.rand, k_first=9)
 
 
 
-
-# für die beobachten Daten, MUSS noch berarbeitet werden !!!:
+# für die beobachten Daten:
 
 W_k_obs <- function(obs.data, k_first){
   #~ auslagerbar
@@ -114,10 +130,12 @@ W_k_obs <- function(obs.data, k_first){
              sorted.p <- sort(obs.data[[x]])[1:k_first]         ### Sortierung der p.-Werte und anschließend
              sorted.p <- sorted.p[!is.na(sorted.p)]   # nur die behalten, die auch wirkluch da sind (NAs raus)
              p.product <- prod(sorted.p)
-           })
-  }
-}
+           } #((())) Ende function in lapply
+          ) #((())) Ende lapply
+  } #((())) Ende esle
+}  #((())) Ende Funktion
 W_k_obs(liste.obs, 9)
+
 
 ### für beobachtete Daten; nur zum späteren Überprüfen
 obs_k1 <- W_k_obs(liste.obs, k_first=1)
@@ -125,7 +143,10 @@ obs_k2 <- W_k_obs(liste.obs, k_first=2)
 obs_k3 <- W_k_obs(liste.obs, k_first=3)
 obs_k4 <- W_k_obs(liste.obs, k_first=4)
 obs_k5 <- W_k_obs(liste.obs, k_first=5)
-
+obs_k6 <- W_k_obs(liste.obs, k_first=6)
+obs_k7 <- W_k_obs(liste.obs, k_first=7)
+obs_k8 <- W_k_obs(liste.obs, k_first=8)
+obs_k9 <- W_k_obs(liste.obs, k_first=9)
 
 ### k_per ist eine Liste mit den p-product-werten der der k-kleinsten snps 
   # für alle gene aus den permutierten daten
@@ -151,7 +172,11 @@ p.W_k(obs_k5, per_k5)
 ### mittels cbind wird eine matrix erstellt, die ZEILENWEISE die GENE enthält und 
   # als SPALTEN die UNTERSCHIEDLICHEN K
   # das hier ist zur Überprüfung, ob die Funktion funtioniert
-cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)))
+cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)),  
+      unlist(p.W_k(obs_k3, per_k3)), unlist(p.W_k(obs_k4, per_k4)),
+      unlist(p.W_k(obs_k5, per_k5)), unlist(p.W_k(obs_k6, per_k6)),  
+      unlist(p.W_k(obs_k7, per_k7)), unlist(p.W_k(obs_k8, per_k8)),
+      unlist(p.W_k(obs_k9, per_k9)))
 
 
 #es wird eine funktion gebraucht, die die unterschiedlichen p.W_k auf einmal erzeugt
@@ -163,41 +188,64 @@ products.perm <- lapply(c(1:5), W_k_perm, daten=liste.rand)
 products.obs <- lapply(c(1:5), W_k_obs, daten.obs=liste.obs)
 
 
-n.perm <-100
 
-# Funktion um für verschiedene ks die p.Werte zu berechnen
+
+
+### Funktion um für verschiedene ks die p.Werte zu berechnen
 p.W_ks <- function(ks, obs.data, perm.data){
   
-  if(length(obs.data) != length(perm.data)){
+  if(length(obs.data) != length(perm.data)){       ### Sind obs.data und perm.data gleich lang?
     stop("Number of variables/genes in observed and permutated data differ!")
   }
   
   # Abfangen von Fehlern muss hier her!!!!
+  else{
+    
+    n.perm <- nrow(perm.data[[1]])     ### wie viele Permutationen gab es; wird für p.W_ks gebraucht
+    
+    products.perm <- lapply(ks, W_k_perm, perm.data=perm.data)     ### Funtion W_k_perm wird gebraucht !
+                                                                     # Produkte der k-kleinsten SNPs
+    products.obs <- lapply(ks, W_k_obs, obs.data=obs.data)         ### Funtion W_k_obs wird gebraucht !
+                                                                     # Produkte der k-kleinsten SNPs
+    
+    n.gene <- length(liste.obs)       ### Anzahl Gene muss bestimmt werden, damit für alle
+                                        # ks über jedes Gen die Berechnung läuft
+    
+    temp <- lapply(seq_along(ks), FUN=function(x){
+      unlist(lapply(c(1:n.gene), FUN=function(gene){   ### unlist, damit nicht listen in listen entstehen
+        sum(products.perm[[x]][[gene]] <= products.obs[[x]][[gene]])/n.perm
+      } #((())) Ende function vom inneren lapply
+      ) #((())) Ende inneres lapply
+      ) #((())) Ende unlist()
+    } #((())) Ende function aeusseres lapply
+    ) #((())) Ende auesseres lapply
+    
+    out <- matrix(unlist(temp), ncol=length(ks), byrow=FALSE)
+    colnames(out) <- ks
+    rownames(out) <- names(obs.data)
+    
+  } #((())) Ende else
+  return(out)
+} #((())) Ende Funktion
+
+p.W_ks(c(6, 7), obs.data=liste.obs, perm.data=liste.rand)
+
   
-  products.perm <- lapply(ks, W_k_perm, perm.data=perm.data)     ### Funtion W_k_perm wird gebraucht !
-                                                                # Produkte der k-kleinsten SNPs
-  products.obs <- lapply(ks, W_k_obs, obs.data=obs.data)    ### Funtion W_k_obs wird gebraucht !
-                                                                # Produkte der k-kleinsten SNPs
-  
-  n.gene <- length(liste.obs)       ### Anzahl Gene muss bestimmt werden, damit für alle
-                                      # ks über jedes Gen die berechnung läuft
-  
-  lapply(ks, FUN=function(x){
-    unlist(lapply(c(1:n.gene), FUN=function(gene){
-      sum(products.perm[[x]][[gene]] <= products.obs[[x]][[gene]])/n.perm
-      }
-      )
-    )  
-  }
-  )
-}
-
-p.W_ks(c(1,2,3))
 
 
 
 
-str(test[[1]])
+p.W_ks(c(1,2,3), obs.data=liste.obs, perm.data=liste.rand)
+
+ks <- c(1,2,3)
+colnames(gene_ks) <- ks
+rm(ks)
+
+
+
+
+
+
 
 
 products.perm[[2]][[3]] <= products.obs[[2]][[3]]
