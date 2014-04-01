@@ -120,6 +120,11 @@ W_k_obs <- function(daten.obs, k_first){
 }
 W_k_obs(liste.obs, 9)
 
+obs_k1 <- W_k_obs(liste.obs, k_first=1)
+obs_k2 <- W_k_obs(liste.obs, k_first=2)
+obs_k3 <- W_k_obs(liste.obs, k_first=3)
+obs_k4 <- W_k_obs(liste.obs, k_first=4)
+obs_k5 <- W_k_obs(liste.obs, k_first=5)
 
 
 ### k_per ist eine Liste mit den p-product-werten der der k-kleinsten snps 
@@ -134,8 +139,19 @@ p.W_k <- function(k_obs, k_per){
 }
 
 
-unlist(p.W_k(obs_k1, per_k1))
+p.W_k(obs_k1, per_k1)
+p.W_k(obs_k2, per_k2)
+p.W_k(obs_k3, per_k3)
+p.W_k(obs_k4, per_k4)
+p.W_k(obs_k5, per_k5)
 
+
+### mittels cbind wird eine matrix erstellt, die ZEILENWEISE die GENE enthält und 
+  # als SPALTEN die UNTERSCHIEDLICHEN K
+cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)))
+
+
+#es wird eine funktion gebraucht, die die unterschiedlichen p.W_k auf einmal erzeugt
 
 
 lapply(c(seq_along(d_k1)), 
