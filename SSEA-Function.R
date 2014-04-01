@@ -43,30 +43,29 @@ b <- lapply(c(1,2,3), FUN=function(var){    # äußere lapply für Genauswahl de
 
 
 
-k_counter <- NULL
-
-W_k_perm <- function(daten, k_first){
+W_k_perm <- function(perm.data, k_first){
   #~ auslagerbar
   is.wholenumber <- function(k_first, tol = .Machine$double.eps^0.5){ ### Abfangfunktion, ob k_first
     abs(k_first - round(k_first)) < tol}                                # ganzzahlig ist
   #~
-  if(is.list(daten)!=TRUE){                                           ### Fehlerabfangung; Input muss eine 
+  if(is.list(perm.data)!=TRUE){                                           ### Fehlerabfangung; Input muss eine 
                                                                         # Liste sein; jedes Element der Liste 
                                                                         # ist ein Dataframe/matrix mit SNPs
-    print("Stop! Input has to be a list. Each element hast to be a SNP-data-frame for a specific gen")
+    stop("Stop! Input has to be a list. Each element hast to be a SNP-data-frame for a specific gen")
   }
   if(is.wholenumber(k_first)!=TRUE | k_first<=0){
-    print("Stop! k_first has to be a whole positiv number")
+    stop("Stop! k_first has to be a whole positiv number")
   }
+  
+  
   else{
-    lapply(c(seq_along(daten)), FUN=function(var){   ### äußere lapply für Genauswahl der in der Liste
-      apply(daten[[var]], MARGIN=1,             ### inneres apply für zeilenweisen Zugriff auf die 
+    lapply(c(seq_along(perm.data)), FUN=function(var){   ### äußere lapply für Genauswahl der in der Liste
+      apply(perm.data[[var]], MARGIN=1,             ### inneres apply für zeilenweisen Zugriff auf die 
                                                        # Datensätze/matrizen mit den Variablen
             #~ auslagerbar
             FUN=function(x){
               sorted.p <- sort(x)[1:k_first]         ### Sortierung der p.-Werte und anschließend
               sorted.p <- sorted.p[!is.na(sorted.p)]   # nur die behalten, die auch wirkluch da sind (NAs raus)
-              #k_counter
               p.product <- prod(sorted.p)
               
               
@@ -84,7 +83,7 @@ d <- W_k_perm(liste.rand, 9)
 d[[3]][100]
 d
 
-# für permutierte dateb
+# für permutierte daten; nur zum späteren Überprüfen
 per_k1 <- W_k_perm(liste.rand, k_first=1)
 per_k2 <- W_k_perm(liste.rand, k_first=2)
 per_k3 <- W_k_perm(liste.rand, k_first=3)
@@ -96,31 +95,31 @@ per_k5 <- W_k_perm(liste.rand, k_first=5)
 
 # für die beobachten Daten, MUSS noch berarbeitet werden !!!:
 
-W_k_obs <- function(daten.obs, k_first){
+W_k_obs <- function(obs.data, k_first){
   #~ auslagerbar
   is.wholenumber <- function(k_first, tol = .Machine$double.eps^0.5){ ### Abfangfunktion, ob k_first
     abs(k_first - round(k_first)) < tol}                                # ganzzahlig ist
   #~
-  if(is.list(daten.obs)!=TRUE){                                           ### Fehlerabfangung; Input muss eine 
+  if(is.list(obs.data)!=TRUE){                                        ### Fehlerabfangung; Input muss eine 
                                                                         # Liste sein; jedes Element der Liste 
                                                                         # ist ein Dataframe/matrix mit SNPs
-    print("Stop! Input has to be a list. Each element hast to be a SNP-data-frame for a specific gen")
+    stop("Stop! Input has to be a list. Each element hast to be a SNP-data-frame for a specific gen")
   }
   if(is.wholenumber(k_first)!=TRUE | k_first<=0){              ### Abfange; positiv und ganzzahlig?
-    print("Stop! k_first has to be a whole positiv number")
+    stop("Stop! k_first has to be a whole positiv number")
   }
   else{
-    lapply(c(seq_along(daten.obs)), 
+    lapply(c(seq_along(obs.data)), 
            FUN=function(x){
-             sorted.p <- sort(daten.obs[[x]])[1:k_first]         ### Sortierung der p.-Werte und anschließend
+             sorted.p <- sort(obs.data[[x]])[1:k_first]         ### Sortierung der p.-Werte und anschließend
              sorted.p <- sorted.p[!is.na(sorted.p)]   # nur die behalten, die auch wirkluch da sind (NAs raus)
-             #k_counter
              p.product <- prod(sorted.p)
            })
   }
 }
 W_k_obs(liste.obs, 9)
 
+### für beobachtete Daten; nur zum späteren Überprüfen
 obs_k1 <- W_k_obs(liste.obs, k_first=1)
 obs_k2 <- W_k_obs(liste.obs, k_first=2)
 obs_k3 <- W_k_obs(liste.obs, k_first=3)
@@ -163,15 +162,28 @@ cbind(unlist(obs_k1),unlist(obs_k2),unlist(obs_k3))
 products.perm <- lapply(c(1:5), W_k_perm, daten=liste.rand)
 products.obs <- lapply(c(1:5), W_k_obs, daten.obs=liste.obs)
 
+
 n.perm <-100
 
 # Funktion um für verschiedene ks die p.Werte zu berechnen
-p.W_ks <- function(ks){
-  products.perm <- lapply(ks, W_k_perm, daten=liste.rand)
-  products.obs <- lapply(ks, W_k_obs, daten.obs=liste.obs)
+p.W_ks <- function(ks, obs.data, perm.data){
+  
+  if(length(obs.data) != length(perm.data)){
+    stop("Number of variables/genes in observed and permutated data differ!")
+  }
+  
+  # Abfangen von Fehlern muss hier her!!!!
+  
+  products.perm <- lapply(ks, W_k_perm, perm.data=perm.data)     ### Funtion W_k_perm wird gebraucht !
+                                                                # Produkte der k-kleinsten SNPs
+  products.obs <- lapply(ks, W_k_obs, obs.data=obs.data)    ### Funtion W_k_obs wird gebraucht !
+                                                                # Produkte der k-kleinsten SNPs
+  
+  n.gene <- length(liste.obs)       ### Anzahl Gene muss bestimmt werden, damit für alle
+                                      # ks über jedes Gen die berechnung läuft
   
   lapply(ks, FUN=function(x){
-    unlist(lapply(c(1,2,3), FUN=function(gene){
+    unlist(lapply(c(1:n.gene), FUN=function(gene){
       sum(products.perm[[x]][[gene]] <= products.obs[[x]][[gene]])/n.perm
       }
       )
@@ -180,7 +192,7 @@ p.W_ks <- function(ks){
   )
 }
 
-p.W_ks(1)
+p.W_ks(c(1,2,3))
 
 
 
