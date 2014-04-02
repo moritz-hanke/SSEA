@@ -243,25 +243,24 @@ k.smallest_per_gen <- function(p.w_k_data){
     warning("There are more columns than rows. Are your rows the genes/sets and the columns the ks???")
   }
   
-  smallest.p <- apply(p.w_k_data, MARGIN=1, min)
-  gene <- names(smallest.p)
-  k <- sapply(seq_along(gene), 
+  smallest.p <- apply(p.w_k_data, MARGIN=1, min) ### für jedes Gen/Set den kleinsten p-Wert
+  gene <- names(smallest.p)   ### Wie heißen die Gene/Sets?
+  k <- sapply(seq_along(gene),  ### kurzes sapply, um ein VEKTOR zu erstellen, der den das
+                                  # kleinste k für die kleinsten p-Werte eines Gens/Sets findet
               FUN=function(x){
                 min(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE))
               })
-  out <- as.matrix(cbind(gene, k))
+  
+  out <- as.data.frame(as.matrix(cbind(gene, k)))
+  out[,2] <- as.numeric(out[,2])
   return(out)
 }
 
-k.smallest_per_gen(ps_per_k)
+selected_ks <- k.smallest_per_gen(ps_per_k)
 
 
-
-
-
-
-
-
+### auswahl der entsprechenden snps
+sort(liste.obs[[selected_ks[1,1]]])[1:selected_ks[1,2]]
 
 
 
