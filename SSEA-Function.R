@@ -1,6 +1,6 @@
 # Funktionen, um SSEA durchzuführen
 
-
+### Ein paar Zufallszahlen
 p.rand <- matrix(round(runif(2600, 0, 1), 8), ncol=26, byrow=T)
 p.obs <- matrix(round(runif(26, 0, 1), 8), ncol=26, byrow=T)
 colnames(p.rand) <- letters[1:26]
@@ -91,10 +91,7 @@ W_k_perm <- function(perm.data, k_first){
   
 } #((())) Ende der Funktion
 
-d <- W_k_perm(liste.rand, 9)
 
-d[[3]][100]
-d
 
 # für permutierte daten; nur zum späteren Überprüfen
 per_k1 <- W_k_perm(liste.rand, k_first=1)
@@ -179,15 +176,6 @@ cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)),
       unlist(p.W_k(obs_k9, per_k9)))
 
 
-#es wird eine funktion gebraucht, die die unterschiedlichen p.W_k auf einmal erzeugt
-lapply(c(1,2), W_k_obs, daten.obs=liste.obs)       ### Zeilen sind Gene, Spalten unterschiedliche ks
-cbind(unlist(obs_k1),unlist(obs_k2),unlist(obs_k3))
-
-
-products.perm <- lapply(c(1:5), W_k_perm, daten=liste.rand)
-products.obs <- lapply(c(1:5), W_k_obs, daten.obs=liste.obs)
-
-
 
 
 
@@ -228,47 +216,29 @@ p.W_ks <- function(ks, obs.data, perm.data){
   return(out)
 } #((())) Ende Funktion
 
-p.W_ks(c(6, 7), obs.data=liste.obs, perm.data=liste.rand)
 
-  
-
-
-
-
-p.W_ks(c(1,2,3), obs.data=liste.obs, perm.data=liste.rand)
-
-ks <- c(1,2,3)
-colnames(gene_ks) <- ks
-rm(ks)
+ps_per_k <- p.W_ks(c(1:9), obs.data=liste.obs, perm.data=liste.rand)
 
 
 
 
-
-
-
-
-products.perm[[2]][[3]] <= products.obs[[2]][[3]]
-
-
-products.perm[[1]] <= products.obs
-
-
-sum((lapply(c(1,2), W_k_perm, daten=liste.rand)[[2]][[3]] <= lapply(c(1,2), W_k_obs, daten.obs=liste.obs)[[2]][[3]]))/
-  nrow(liste.rand[[1]])
-
-
-
-
-
-
-
-
-
-lapply(c(seq_along(d_k1)), 
+# Funktion um die kleinsten ps für die ks zu finden
+smallest.p <- apply(ps_per_k, MARGIN=1, min)
+gene <- names(smallest.p)
+k <- sapply(seq_along(gene), 
        FUN=function(x){
-         sum((d_k1[[x]] <= e_k1[[x]]))/length(d_k1[[x]])
+         min(which((ps_per_k[gene[x], ] == smallest.p[x])==TRUE))
        })
+cbind(gene, k)
+
+
+
+
+
+
+
+
+
 
 
 
