@@ -260,7 +260,13 @@ selected_ks <- k.smallest_per_gen(ps_per_k)
 
 
 ### auswahl der entsprechenden snps
-sort(liste.obs[[selected_ks[1,1]]])[1:selected_ks[1,2]]
+sort(liste.obs[[selected_ks[1,1]]])[1:selected_ks[1,2]]   #mittels vektor und lapply die korrekten zeilen(!) ansteuern
+
+####
+# to do:
+### simulation für gsea-snp
+### wiesowählen bei der ssea-methode die autoren erst alle snps aus und nicht nur die, die auch für die eigentlichen PW interessant
+  # sind? shcließlich oist das ja nur für die wahl der optimalen snps und nicht als reine ARTP gedacht; Ronja fragen!
 
 
 
