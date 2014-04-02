@@ -181,6 +181,11 @@ cbind(unlist(p.W_k(obs_k1, per_k1)), unlist(p.W_k(obs_k2, per_k2)),
 
 ### Funktion um für verschiedene ks die p.Werte zu berechnen
 p.W_ks <- function(ks, obs.data, perm.data){
+        ### ks:         VEKTOR, der unterschiedliche Truncation Points (ks) enthält
+        ### obs.data:   LISTE (!), die für jedes Gen/Set eine Element enthält, das
+          #             wiederum als VEKTOR(!) die beobachteten (!) SNPs enthält
+        ### perm.data:  LISTE (!), die für jedes Gen/Set eine Element enthält, das
+          #             wiederum als MATRIX/DATAFRAME(!) die permutierten(!) SNPs enthält
   
   if(length(obs.data) != length(perm.data)){       ### Sind obs.data und perm.data gleich lang?
     stop("Number of variables/genes in observed and permutated data differ!")
@@ -217,22 +222,38 @@ p.W_ks <- function(ks, obs.data, perm.data){
 } #((())) Ende Funktion
 
 
-ps_per_k <- p.W_ks(c(1:9), obs.data=liste.obs, perm.data=liste.rand)
+ps_per_k <- p.W_ks(c(1:12), obs.data=liste.obs, perm.data=liste.rand)
 
 
+### Absichtlich zwei verschiedene Funktionen für p-werte über alle ks und nur die optimalen ks,
+  # da so später ggf. noch mal geschaut werden kann, wie sich generell die 
 
+### Funktion um die kleinsten ps für die ks zu finden
 
-# Funktion um die kleinsten ps für die ks zu finden
-smallest.p <- apply(ps_per_k, MARGIN=1, min)
-gene <- names(smallest.p)
-k <- sapply(seq_along(gene), 
-       FUN=function(x){
-         min(which((ps_per_k[gene[x], ] == smallest.p[x])==TRUE))
-       })
-cbind(gene, k)
+k.smallest_per_gen <- function(p.w_k_data){
+        ### p.w_k_data: MATRIX, die die p-Werte der einzelnen ks enthält; Zeilen sind die Sets/Gene und
+          #             Spalten sind die unterschiedlichen ks!
+  
+  if(is.matrix(p.w_k_data)!=TRUE){    ### p-Werte der unterschiedlichen ks müssen in Matrixform sein
+    stop("Need matrix to proceed; ros have to be sets/genes, columns have to be different ks")
+  }
+  if(dim(p.w_k_data)[1] <= dim(p.w_k_data)[2]){   ### wenn es mehr Zeilen als Spalten gibt, koennte das der
+                                                    # Hinweis sein, dass nicht die Zeilen die Gene und die
+                                                    # Spalten die unterschiedlichen k sind; darum Warnung
+    warning("There are more columns than rows. Are your rows the genes/sets and the columns the ks???")
+  }
+  
+  smallest.p <- apply(p.w_k_data, MARGIN=1, min)
+  gene <- names(smallest.p)
+  k <- sapply(seq_along(gene), 
+              FUN=function(x){
+                min(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE))
+              })
+  out <- as.matrix(cbind(gene, k))
+  return(out)
+}
 
-
-
+k.smallest_per_gen(ps_per_k)
 
 
 
