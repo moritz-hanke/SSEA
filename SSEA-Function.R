@@ -203,6 +203,8 @@ p.W_ks <- function(ks, obs.data, perm.data){
     
     n.gene <- length(liste.obs)       ### Anzahl Gene muss bestimmt werden, damit für alle
                                         # ks über jedes Gen die Berechnung läuft
+                                        # MUSS NOCH Überarbeitet werden! funktioniert nicht, wenn ein
+                                        # Gen nur einen SNP hat !!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     temp <- lapply(seq_along(ks), FUN=function(x){
       unlist(lapply(c(1:n.gene), FUN=function(gene){   ### unlist, damit nicht listen in listen entstehen
