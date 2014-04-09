@@ -175,7 +175,6 @@ p.W_ks <- function(ks, obs.data, perm.data){
     stop("Number of variables/genes in observed and permutated data differ!")
   }
   
-  # Abfangen von Fehlern muss hier her!!!!
   else{
     
     if(is.null(nrow(perm.data[[1]]))){ ### wie viele Permutationen gab es; wird für p.W_ks gebraucht
@@ -212,7 +211,7 @@ p.W_ks <- function(ks, obs.data, perm.data){
 } #((())) Ende Funktion
 
 
-ps_per_k <- p.W_ks(c(1:12), obs.data=liste.obs, perm.data=liste.rand)
+ps_per_k <- p.W_ks(c(1:26), obs.data=liste.obs, perm.data=liste.rand)
 
 
 ### Absichtlich zwei verschiedene Funktionen für p-werte über alle ks und nur die optimalen ks,
@@ -241,8 +240,7 @@ k.smallest_per_gen <- function(p.w_k_data){
                 min(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE))
               })
   
-  out <- as.data.frame(as.matrix(cbind(gene, k)))
-  out[,2] <- as.numeric(out[,2])
+  out <- data.frame(gene, k)
   return(out)
 }
 
