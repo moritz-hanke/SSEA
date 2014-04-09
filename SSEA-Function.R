@@ -12,7 +12,7 @@ set2 <- letters[c(5,7:13)]
 set3 <- letters[14:25]
 set4 <- letters[26]
 
-liste.obs <- vector(mode="list", length=3)
+liste.obs <- vector(mode="list", length=4)
 liste.obs[[1]] <- p.obs[,colnames(p.obs) %in% set1]
 liste.obs[[2]] <- p.obs[,colnames(p.obs) %in% set2]
 liste.obs[[3]] <- p.obs[,colnames(p.obs) %in% set3]
@@ -20,7 +20,7 @@ liste.obs[[4]] <- p.obs[,colnames(p.obs) %in% set4]
 names(liste.obs) <- c("set1", "set2", "set3", "set4")
 
 
-liste.rand <- vector(mode="list", length=3)
+liste.rand <- vector(mode="list", length=4)
 liste.rand[[1]] <- p.rand[,colnames(p.rand) %in% set1]
 liste.rand[[2]] <- p.rand[,colnames(p.rand) %in% set2]
 liste.rand[[3]] <- p.rand[,colnames(p.rand) %in% set3]
@@ -266,31 +266,39 @@ OBS.snps <- selected.snps.obs(obs.data=liste.obs, selected_ks=selected_ks)
 
 
 
-selected.snps.perm <- function(perm.data, obs.data, selected_ks){
-  out <- lapply(seq_along(obs.data),
+selected.snps.perm <- function(perm.data, selected.snps.obs){
+  out <- lapply(seq_along(perm.data),
                 FUN=function(var){
-                  auswahl <- NULL 
-                  auswahl <- which(colnames(perm.data[[var]]) %in% 
-                                     names(sort(obs.data[[selected_ks[var,1]]])[1:selected_ks[var,2]]))
-                  temp.data <- perm.data[[var]]
-                  if(length(dim(temp.data)) < 2){
-                    temp.data <- as.matrix(temp.data, ncol=1)
-                    colnames(temp.data) <- names(obs.data[[var]])
-                    temp.data
-                  }
-                  else{
-                    temp.data <- as.matrix(temp.data)
-                    temp.data[,auswahl]
-                  }
+                   if(length(dim(perm.data[[var]]))< 2){
+                     temp.data <- as.matrix(perm.data[[var]], ncol=1)
+                     colnames(temp.data) <- names(selected.snps.obs[[var]])
+                     temp.data
+                   }else{
+                     temp.data <- perm.data[[var]][,which(colnames(perm.data[[var]]) %in%  names(selected.snps.obs[[var]]))]
+                     if(length(dim(temp.data)) <2){
+                       temp.data <- as.matrix(temp.data, ncol=1)
+                       colnames(temp.data) <- names(selected.snps.obs[[var]])
+                     }
+                    
+                     temp.data
+                   }
+                     
                 })
-  names(out) <- names(obs.data)
+  names(out) <- names(selected.snps.obs)
   return(out)
 }
 
-PERM.snps <- selected.snps.perm(perm.data=liste.rand, obs.data=liste.obs, selected_ks=selected_ks)
+PERM.snps <- selected.snps.perm(perm.data=liste.rand, selected.snps.obs=OBS.snps)
 
 
+colnames(PERM.snps[[1]])==sort(names(OBS.snps[[1]]))
+colnames(PERM.snps[[2]])==sort(names(OBS.snps[[2]]))
+colnames(PERM.snps[[3]])==sort(names(OBS.snps[[3]]))
+colnames(PERM.snps[[4]])==sort(names(OBS.snps[[4]]))
 
+table(PERM.snps[[1]]==liste.rand[[1]][,colnames(PERM.snps[[1]])])
+table(PERM.snps[[2]]==liste.rand[[2]][,colnames(PERM.snps[[2]])])
+table(PERM.snps[[3]]==liste.rand[[3]][,colnames(PERM.snps[[3]])])
 
 
 ####
