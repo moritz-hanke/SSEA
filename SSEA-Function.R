@@ -11,9 +11,6 @@ set1 <- letters[c(1:4, 6)]
 set2 <- letters[c(5,7:13)]
 set3 <- letters[14:25]
 set4 <- letters[26]
-#testsets
-set1 <- letters[c(1)]
-set2 <- letters[c(2:13)]
 
 liste.obs <- vector(mode="list", length=3)
 liste.obs[[1]] <- p.obs[,colnames(p.obs) %in% set1]
@@ -29,21 +26,6 @@ liste.rand[[2]] <- p.rand[,colnames(p.rand) %in% set2]
 liste.rand[[3]] <- p.rand[,colnames(p.rand) %in% set3]
 liste.rand[[4]] <- p.rand[,colnames(p.rand) %in% set4]
 names(liste.rand) <- c("set1", "set2", "set3", "set4")
-
-#################
-# BEISPIEL für Schachtelung von applys u.Ä.
-# für die zufälligen/permutierten Daten soll eine Sortierung für
-# jedes set/gen der variablen/snps durchgenommen werden
-b <- lapply(c(1,2,3), FUN=function(var){    # äußere lapply für Genauswahl der in der Liste
-  apply(liste.rand[[var]], MARGIN=1,        # inneres apply für zeilenweisen Zugriff auf die 
-                                            # Datensätze/matrizen mit den Variablen
-      FUN=function(x){
-        sort(x)[]
-      }
-    )
-  }
-)
-
 
 
 
@@ -267,14 +249,55 @@ k.smallest_per_gen <- function(p.w_k_data){
 selected_ks <- k.smallest_per_gen(ps_per_k)
 
 
-### auswahl der entsprechenden snps
-sort(liste.obs[[selected_ks[1,1]]])[1:selected_ks[1,2]]   #mittels vektor und lapply die korrekten zeilen(!) ansteuern
+
+### auswahl der entsprechenden snps in der Liste mit den p-Werten der
+  # beobachteten SNPs
+
+selected.snps.obs <- function(obs.data, selected_ks){
+  out <- lapply(seq_along(obs.data), 
+         FUN=function(var){
+           sort(obs.data[[selected_ks[var,1]]])[1:selected_ks[var,2]]  
+         })
+  names(out) <- names(obs.data)
+  return(out)
+}
+
+OBS.snps <- selected.snps.obs(obs.data=liste.obs, selected_ks=selected_ks)
+
+
+
+selected.snps.perm <- function(perm.data, obs.data, selected_ks){
+  out <- lapply(seq_along(obs.data),
+                FUN=function(var){
+                  auswahl <- NULL 
+                  auswahl <- which(colnames(perm.data[[var]]) %in% 
+                                     names(sort(obs.data[[selected_ks[var,1]]])[1:selected_ks[var,2]]))
+                  temp.data <- perm.data[[var]]
+                  if(length(dim(temp.data)) < 2){
+                    temp.data <- as.matrix(temp.data, ncol=1)
+                    colnames(temp.data) <- names(obs.data[[var]])
+                    temp.data
+                  }
+                  else{
+                    temp.data <- as.matrix(temp.data)
+                    temp.data[,auswahl]
+                  }
+                })
+  names(out) <- names(obs.data)
+  return(out)
+}
+
+PERM.snps <- selected.snps.perm(perm.data=liste.rand, obs.data=liste.obs, selected_ks=selected_ks)
+
+
+
+
 
 ####
 # to do:
 ### simulation für gsea-snp
 ### wiesowählen bei der ssea-methode die autoren erst alle snps aus und nicht nur die, die auch für die eigentlichen PW interessant
-  # sind? shcließlich oist das ja nur für die wahl der optimalen snps und nicht als reine ARTP gedacht; Ronja fragen!
+  # sind? shcließlich ist das ja nur für die wahl der optimalen snps und nicht als reine ARTP gedacht; Ronja fragen!
 
 
 
