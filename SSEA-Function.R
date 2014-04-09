@@ -11,7 +11,9 @@ set1 <- letters[c(1:4, 6)]
 set2 <- letters[c(5,7:13)]
 set3 <- letters[14:25]
 set4 <- letters[26]
-
+#testsets
+set1 <- letters[c(1)]
+set2 <- letters[c(2:13)]
 
 liste.obs <- vector(mode="list", length=3)
 liste.obs[[1]] <- p.obs[,colnames(p.obs) %in% set1]
@@ -194,8 +196,13 @@ p.W_ks <- function(ks, obs.data, perm.data){
   # Abfangen von Fehlern muss hier her!!!!
   else{
     
-    n.perm <- nrow(perm.data[[1]])     ### wie viele Permutationen gab es; wird für p.W_ks gebraucht
-    
+    if(is.null(nrow(perm.data[[1]]))){ ### wie viele Permutationen gab es; wird für p.W_ks gebraucht
+      n.perm <- length(perm.data[[1]])   # es muss überprüft werden, ob das erste set nur aus einem
+    }                                    # Vektor besteht. Wenn ja, muss dessen Laenge genommen werden
+    else{
+      n.perm <- nrow(perm.data[[1]])
+    }
+         
     products.perm <- lapply(ks, W_k_perm, perm.data=perm.data)     ### Funtion W_k_perm wird gebraucht !
                                                                      # Produkte der k-kleinsten SNPs
     products.obs <- lapply(ks, W_k_obs, obs.data=obs.data)         ### Funtion W_k_obs wird gebraucht !
@@ -203,8 +210,7 @@ p.W_ks <- function(ks, obs.data, perm.data){
     
     n.gene <- length(obs.data)       ### Anzahl Gene muss bestimmt werden, damit für alle
                                         # ks über jedes Gen die Berechnung läuft
-                                        # MUSS NOCH Überarbeitet werden! funktioniert nicht, wenn ein
-                                        # Gen nur einen SNP hat !!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                        
     
     temp <- lapply(seq_along(ks), FUN=function(x){
       unlist(lapply(c(1:n.gene), FUN=function(gene){   ### unlist, damit nicht listen in listen entstehen
