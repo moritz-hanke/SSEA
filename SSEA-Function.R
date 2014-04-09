@@ -201,7 +201,7 @@ p.W_ks <- function(ks, obs.data, perm.data){
     products.obs <- lapply(ks, W_k_obs, obs.data=obs.data)         ### Funtion W_k_obs wird gebraucht !
                                                                      # Produkte der k-kleinsten SNPs
     
-    n.gene <- length(liste.obs)       ### Anzahl Gene muss bestimmt werden, damit für alle
+    n.gene <- length(obs.data)       ### Anzahl Gene muss bestimmt werden, damit für alle
                                         # ks über jedes Gen die Berechnung läuft
                                         # MUSS NOCH Überarbeitet werden! funktioniert nicht, wenn ein
                                         # Gen nur einen SNP hat !!!!!!!!!!!!!!!!!!!!!!!!!!!
