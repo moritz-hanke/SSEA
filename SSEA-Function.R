@@ -211,7 +211,7 @@ p.W_ks <- function(ks, obs.data, perm.data){
 } #((())) Ende Funktion
 
 
-ps_per_k <- p.W_ks(c(1:26), obs.data=liste.obs, perm.data=liste.rand)
+ps_per_k <- p.W_ks(c(1,5,8), obs.data=liste.obs, perm.data=liste.rand)
 
 
 ### Absichtlich zwei verschiedene Funktionen für p-werte über alle ks und nur die optimalen ks,
@@ -237,7 +237,7 @@ k.smallest_per_gen <- function(p.w_k_data){
   k <- sapply(seq_along(gene),  ### kurzes sapply, um ein VEKTOR zu erstellen, der den das
                                   # kleinste k für die kleinsten p-Werte eines Gens/Sets findet
               FUN=function(x){
-                min(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE))
+                min(names(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE)))
               })
   
   out <- data.frame(gene, k)
