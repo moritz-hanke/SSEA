@@ -237,9 +237,9 @@ k.smallest_per_gen <- function(p.w_k_data){
   k <- sapply(seq_along(gene),  ### kurzes sapply, um ein VEKTOR zu erstellen, der den das
                                   # kleinste k für die kleinsten p-Werte eines Gens/Sets findet
               FUN=function(x){
-                min(names(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE)))
-              })
-  
+                min(names(which((p.w_k_data[gene[x], ] == smallest.p[x])==TRUE))) ### name() damit der
+              })                                          # Spaltenname(!) und nicht die Spaltenposition
+                                                          # als Bestimmung von k ausgewählt wird
   out <- data.frame(gene, k)
   return(out)
 }
