@@ -224,7 +224,7 @@ k.smallest_per_gen <- function(p.w_k_data){
           #             Spalten sind die unterschiedlichen ks!
   
   if(is.matrix(p.w_k_data)!=TRUE){    ### p-Werte der unterschiedlichen ks müssen in Matrixform sein
-    stop("Need matrix to proceed; ros have to be sets/genes, columns have to be different ks")
+    stop("Need matrix to proceed; rows have to be sets/genes, columns have to be different ks")
   }
   if(dim(p.w_k_data)[1] <= dim(p.w_k_data)[2]){   ### wenn es mehr Zeilen als Spalten gibt, koennte das der
                                                     # Hinweis sein, dass nicht die Zeilen die Gene und die
